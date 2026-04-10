@@ -1,0 +1,5 @@
+# Main Telegram Bot Framework (Asynchronous)
+python-telegram-bot>=20.8
+
+# Environment variables (.env) load karne ke liye
+python-dotenv>=1.0.0
