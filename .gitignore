@@ -1,0 +1,32 @@
+# 👉 Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 👉 Virtual Environment
+venv/
+env/
+.venv/
+.env/
+
+# 👉 Secrets & Environment Variables
+.env
+.env.local
+
+# Agar tum token direct config.py me rakhne wale ho, toh isko uncomment kar dena
+# config.py 
+
+# 👉 Database & User Data (Category 2 & 4 ka data)
+users.json
+simple_spam.db
+*.sqlite3
+*.db
+
+# 👉 Logs
+*.log
+
+# 👉 IDE & OS Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
