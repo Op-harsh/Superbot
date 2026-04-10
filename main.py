@@ -19,7 +19,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # --- 3. Import Moduler Handlers ---
-from handlers.cat1_harsh import promote_harsh, demote_harsh, count_messages, toggle_freedom, process_harsh_activity
+from handlers.cat1_harsh import promote_harsh, demote_harsh, count_messages, toggle_freedom, process_harsh_activity, permission_callback
 from handlers.cat2_admin import allow_user, rmv_user, allowed_list
 from handlers.cat3_spam import spam_command, stop_spam, toggle_reaction, process_auto_reaction
 from handlers.cat4_lock import lock_command, unlock_command, check_locked_content
@@ -52,10 +52,12 @@ def main():
     application = ApplicationBuilder().token(BOT_TOKEN).build()
 
     # --- CATEGORY 1 Commands (Harsh Control) ---
+# --- CATEGORY 1 Commands (Harsh Control) ---
     application.add_handler(CommandHandler("promoteharsh", promote_harsh))
     application.add_handler(CommandHandler("demoteharsh", demote_harsh))
     application.add_handler(CommandHandler("count", count_messages))
     application.add_handler(CommandHandler("freedom", toggle_freedom))
+    application.add_handler(CallbackQueryHandler(permission_callback)) # <-- YE NAYI LINE ADD KARNI HAI
 
     # --- CATEGORY 2 Commands (Admin Control) ---
     application.add_handler(CommandHandler("allowuser", allow_user))
