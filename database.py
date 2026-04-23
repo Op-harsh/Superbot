@@ -98,3 +98,41 @@ def get_user_locks(user_id: int) -> list:
     """Check karega ki is user par kya-kya pabandi (locks) lagi hain."""
     data = _load_data()
     return data["users"].get(str(user_id), {}).get("locks", [])
+
+# --- Category 6: Tagging System ---
+def create_custom_list(chat_id: int, list_name: str) -> bool:
+    data = _load_data()
+    cid = str(chat_id)
+    if "lists" not in data: data["lists"] = {}
+    if cid not in data["lists"]: data["lists"][cid] = {}
+    if list_name in data["lists"][cid]: return False
+        
+    data["lists"][cid][list_name] = []
+    _save_data(data)
+    return True
+
+def add_user_to_list(chat_id: int, list_name: str, user_id: int):
+    data = _load_data()
+    cid = str(chat_id)
+    if "lists" not in data: data["lists"] = {}
+    if cid not in data["lists"]: data["lists"][cid] = {}
+    if list_name not in data["lists"][cid]: data["lists"][cid][list_name] = []
+        
+    if user_id not in data["lists"][cid][list_name]:
+        data["lists"][cid][list_name].append(user_id)
+        _save_data(data)
+
+def get_list_users(chat_id: int, list_name: str) -> list:
+    data = _load_data()
+    return data.get("lists", {}).get(str(chat_id), {}).get(list_name, [])
+
+def add_group_user(user_id: int):
+    data = _load_data()
+    if "group_users" not in data: data["group_users"] = []
+    if user_id not in data["group_users"]:
+        data["group_users"].append(user_id)
+        _save_data(data)
+
+def get_all_group_users() -> list:
+    return _load_data().get("group_users", [])
+
