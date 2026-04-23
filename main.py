@@ -25,10 +25,18 @@ from handlers.cat3_spam import spam_command, stop_spam, toggle_reaction, process
 from handlers.cat4_lock import lock_command, unlock_command, check_locked_content
 from handlers.cat5_help import help_command
 
+# NAYA IMPORT: Category 6 ke naye functions
+from handlers.cat6_tag import create_tag_list, add_to_list, tag_custom_list, tag_all
+from database import init_db, add_group_user
+
 # --- 4. The Master Pipeline (Conflict Fixer) ---
 async def master_message_pipeline(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message:
         return
+
+    # STEP 0: Tagging Data Collection (/all command ke liye)
+    # Jo bhi banda message karega, uski ID chup-chaap DB me save ho jayegi
+    add_group_user(update.effective_user.id)
 
     # STEP 1: Lock Check (Category 4)
     is_deleted = await check_locked_content(update, context)
@@ -48,16 +56,18 @@ async def master_message_pipeline(update: Update, context: ContextTypes.DEFAULT_
 def main():
     logger.info("Bot engine start ho raha hai...")
     
+    # NAYI LINE: Database start hone par SuperAdmin fix karega
+    init_db()
+    
     # Application build karo
     application = ApplicationBuilder().token(BOT_TOKEN).build()
 
     # --- CATEGORY 1 Commands (Harsh Control) ---
-# --- CATEGORY 1 Commands (Harsh Control) ---
     application.add_handler(CommandHandler("promoteharsh", promote_harsh))
     application.add_handler(CommandHandler("demoteharsh", demote_harsh))
     application.add_handler(CommandHandler("count", count_messages))
     application.add_handler(CommandHandler("freedom", toggle_freedom))
-    application.add_handler(CallbackQueryHandler(permission_callback)) # <-- YE NAYI LINE ADD KARNI HAI
+    application.add_handler(CallbackQueryHandler(permission_callback))
 
     # --- CATEGORY 2 Commands (Admin Control) ---
     application.add_handler(CommandHandler("allowuser", allow_user))
@@ -77,7 +87,16 @@ def main():
     application.add_handler(CommandHandler("start", help_command))
     application.add_handler(CommandHandler("help", help_command))
 
+    # --- CATEGORY 6 Commands (Tagging System) ---
+    application.add_handler(CommandHandler("create", create_tag_list))
+    application.add_handler(CommandHandler("add", add_to_list))
+    application.add_handler(CommandHandler("all", tag_all))
+    
+    # CUSTOM TAGS WALA WOH HANDLER (Ise baaki commands ke baad rakhna zaroori hai)
+    application.add_handler(MessageHandler(filters.Regex(r'^/[a-zA-Z0-9_]+'), tag_custom_list))
+
     # --- The Master Pipeline Handler ---
+    # Ye pipeline sabse last me honi chahiye!
     application.add_handler(MessageHandler(filters.ALL & ~filters.COMMAND, master_message_pipeline))
 
     logger.info("Jarvis is online! Polling started...")
